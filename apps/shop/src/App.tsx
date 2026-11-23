@@ -1,26 +1,60 @@
-import { APPS, AppHeader, isDemoMode, useI18n } from "@ethio/core";
-import { CATEGORIES } from "./categories";
+import { lazy, Suspense, useEffect } from "react";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { Layout } from "./components/Layout";
+import { Spinner, ToastProvider } from "./components/ui";
+import { AuthProvider } from "./lib/auth";
+import { CartProvider } from "./lib/cart";
+import { Home } from "./pages/Home";
+import { SearchPage } from "./pages/SearchPage";
+import { ProductPage, ShopPage } from "./pages/ProductPage";
+import { CartPage, CheckoutPage, OrderDonePage } from "./pages/Checkout";
+import { ForgotPage, LoginPage, RegisterPage, ResetPasswordPage } from "./pages/AuthPages";
+import { AccountPage, OrdersPage } from "./pages/Account";
+import { HelpPage, NotFound } from "./pages/Help";
 
-const info = APPS.find((a) => a.key === "shop")!;
+// Verkäufer- und Admin-Bereich werden nur bei Bedarf geladen (kleinerer Start-Download)
+const SellerPage = lazy(() => import("./pages/Seller").then((m) => ({ default: m.SellerPage })));
+const AdminPage = lazy(() => import("./pages/Admin").then((m) => ({ default: m.AdminPage })));
+
+function ScrollTop() {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+}
 
 export function App() {
-  const { t, locale } = useI18n();
   return (
-    <>
-      <AppHeader title={info.name[locale]} color={info.color} />
-      <main style={{ padding: 16, maxWidth: 960, margin: "0 auto" }}>
-        {isDemoMode && <p style={{ background: "#fff1c7", padding: 8, borderRadius: 8 }}>Demo-Modus: keine Datenbank verbunden.</p>}
-        <h1 style={{ fontSize: 22 }}>{t("welcome")}</h1>
-        <h2 style={{ fontSize: 18 }}>{t("cats")}</h2>
-        <div style={{ display: "grid", gap: 8, gridTemplateColumns: "repeat(auto-fill, minmax(110px, 1fr))" }}>
-          {CATEGORIES.map((c) => (
-            <div key={c.id} style={{ background: "#fff", border: "1px solid #e3e6ea", borderRadius: 12, padding: 10, textAlign: "center", fontSize: 13 }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: c.color, margin: "0 auto 6px" }} />
-              {c.name[locale]}
-            </div>
-          ))}
-        </div>
-      </main>
-    </>
+    <BrowserRouter>
+      <ToastProvider>
+        <AuthProvider>
+          <CartProvider>
+            <ScrollTop />
+            <Layout>
+              <Suspense fallback={<Spinner />}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/search" element={<SearchPage />} />
+                  <Route path="/p/:id" element={<ProductPage />} />
+                  <Route path="/shop/:id" element={<ShopPage />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order/:id" element={<OrderDonePage />} />
+                  <Route path="/login" element={<LoginPage />} />
+                  <Route path="/register" element={<RegisterPage />} />
+                  <Route path="/forgot" element={<ForgotPage />} />
+                  <Route path="/reset-password" element={<ResetPasswordPage />} />
+                  <Route path="/account" element={<AccountPage />} />
+                  <Route path="/orders" element={<OrdersPage />} />
+                  <Route path="/seller" element={<SellerPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="/help" element={<HelpPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspense>
+            </Layout>
+          </CartProvider>
+        </AuthProvider>
+      </ToastProvider>
+    </BrowserRouter>
   );
 }

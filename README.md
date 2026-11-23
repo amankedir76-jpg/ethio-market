@@ -46,3 +46,15 @@ Weiterleitungen und Sicherheits-Header liegen in `apps/<name>/public/_redirects`
 ## Ein Konto für alle Apps
 
 Alle Apps nutzen dasselbe Supabase-Projekt. Ein Konto gilt deshalb überall. Liegen die Apps auf verschiedenen Domains (shop-…netlify.app, food-…netlify.app), muss man sich in jeder App einmal anmelden. Mit einer eigenen Domain und Unterdomains (shop.deine-domain.et, food.deine-domain.et) lässt sich das später zu einem einzigen Login zusammenführen.
+
+## ETHIO SHOP – Einrichtung nach dem Hochladen
+
+1. **Supabase → Authentication → URL Configuration**
+   - Site URL: `https://ethio-market.pages.dev`
+   - Redirect URLs: `https://ethio-market.pages.dev/**` und `https://*.ethio-market.pages.dev/**`
+   Ohne diese Einstellung führen Bestätigungs- und Passwort-Links ins Leere.
+2. **Admin werden:** im Shop registrieren, dann im Supabase SQL Editor:
+   `insert into public.platform_admins (user_id) select id from auth.users where email = 'DEINE@EMAIL';`
+3. **Lieferregionen:** im Admin-Bereich unter „Lieferregionen“ eigene Preise und Lieferzeiten eintragen und Regionen aktivieren. Ohne aktive Region ist nur Abholung beim Verkäufer möglich.
+
+Alle Shop-Texte stehen in `apps/shop/src/texts.ts` (Englisch, Amharisch, Afaan Oromoo). Amharische und Oromo-Texte bitte von Muttersprachlern prüfen.
