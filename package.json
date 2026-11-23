@@ -1,0 +1,12 @@
+{
+  "name": "ethio-market",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev:shop": "npm run dev -w @ethio/shop",
+    "dev:food": "npm run dev -w @ethio/food",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "new-app": "node scripts/new-app.mjs"
+  }
+}
